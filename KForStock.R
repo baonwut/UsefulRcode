@@ -2,7 +2,7 @@
 get.quotes<-function(ticker,
                      from=(Sys.Date()-365),
                      to=(Sys.Date())){
-      #ticker="sh600018";from<-as.Date("2014-11-11");to<-as.Date("2014-11-11")
+      #eg:ticker="sh600018";from<-as.Date("2014-11-11");to<-as.Date("2014-11-11")
       begin.base<-"http://biz.finance.sina.com.cn/stock/flash_hq/kline_data.php?&rand=random(10000)&";
       symbol<-paste("symbol=",ticker,sep="")
       #from and end date
@@ -45,8 +45,11 @@ get.multiple.quotes<-function(tkrs,
       tmp
 }
 
+#all stocke id in this file.The type must be vectors.
+#For shanghai,the vector must bulid like "sh600018"
+#For shenzhen,the vector must bulid like "sz002241"
 dow.tickers<-as.vector(t(read.table("allStokeId.txt",head=FALSE)))
-#tkrs<-dow.tickers;ticker<-tkrs[[2]]
+#write out
 write.table(get.multiple.quotes(dow.tickers,
                                 from=as.Date("2014-07-01"),
                                 to=as.Date("2014-10-31")),
