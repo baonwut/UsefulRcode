@@ -21,6 +21,7 @@ get.quotes<-function(ticker,
       #read the date, and insert the stock id
       tmp<-readLines(url)
       tmp<-strsplit(tmp,",")
+      #If one stock is not presence,the loop must be break for next one.
       i<-0
       repeat {
             if(!is.null(unlist(tmp)) & i==0){
@@ -101,15 +102,13 @@ get.multiple.quotes<-function(tkrs,
       tmp
 }
 
+
+#all stocke id in this file.The type must be vectors.
+#For stock in China,the vector must bulid like "600018.SS"or "002241.SZ"
 dow.tickers<-as.vector(t(read.table("yahooStokeId.txt",head=FALSE)))
-tkrs<-dow.tickers
-write.table(tmp,
-            file="股票K值合并yahoo1.txt",
-            sep=",",row.names = FALSE,quote = FALSE)
-
-
+#write out
 write.table(get.multiple.quotes(dow.tickers,
                                 from=as.Date("2014-9-17","%Y-%m-%d"),
-                                to=as.Date("2014-9-17","%Y-%m-%d")),
-            file="股票K值合并yahoo.txt",
+                                to=as.Date("2014-9-20","%Y-%m-%d")),
+            file="YahooStock.txt",
             sep=",",row.names = FALSE,quote = FALSE)
