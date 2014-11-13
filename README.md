@@ -1,2 +1,2 @@
 # Includ the follow R code
-## the K line for stock in sina and yahoo
+The K lines for stocks in sina and yahoo
