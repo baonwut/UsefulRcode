@@ -59,26 +59,35 @@ write.table(get.multiple.quotes(dow.tickers,
             col.names=c("stockId","date","open","high","close","low","change"))
 
 ########数据不足或者某日停盘#######################
-#insert function:
+#insert function
 insertFun<-function(stockname){
       partdt<-df1[df1$stockId==stockname,]
       minNA<-partdt[is.na(partdt$open),"date"]
-      positionNA<-grep(min(minNA),partdt$date)
-      partdt[is.na(partdt$open),c("open","high","close","low","change")]<-
-            ifelse(min(minNA)>min(partdt$date),
-                   partdt[(positionNA-1),c("open","high","close","low","change")],
-                   NA)
+      n<-length(minNA)
+      for(i in 1:n){
+            positionNA<-grep(minNA[i],partdt$date)
+            if(positionNA!=1){
+                  partdt[positionNA,3:7]<-partdt[positionNA-1,3:7]
+            }
+            if(positionNA==1){
+                  partdt[i,3:7]<-NA
+            }
+      }
       partdt
 }
-#result function
+
+#result
 resultData<-function(df1){
-      tockn<-unique(df1[is.na(df1$open),"stockId"])
+      stockn<-unique(df1[is.na(df1$open),"stockId"])
       newdf<-data.frame()
-      for(tockname in tockn){
-            newdf<-rbind(newdf,insertFun(tockname))
+      for(stockname in stockn){
+            newdf<-rbind(newdf,insertFun(stockname))
+            
       }
       newdf<-newdf[!is.na(newdf$open),]
-      newdf<-rbind(newdf,df1[!(df1$stockId %in% tockn),])
+      newdf<-rbind(newdf,df1[!(df1$stockId %in% stockn),])
+      newdf<-newdf[c("stockId","date","open","high","close","low","change")]
+      newdf
 }
 
 #read the data and out put the result
