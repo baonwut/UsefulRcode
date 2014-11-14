@@ -58,6 +58,48 @@ write.table(get.multiple.quotes(dow.tickers,
             sep=",",row.names = FALSE,quote = FALSE,
             col.names=c("stockId","date","open","high","close","low","change"))
 
+########数据不足或者某日停盘#######################
+#insert function:
+insertFun<-function(stockname){
+      partdt<-df1[df1$stockId==stockname,]
+      minNA<-partdt[is.na(partdt$open),"date"]
+      positionNA<-grep(min(minNA),partdt$date)
+      partdt[is.na(partdt$open),c("open","high","close","low","change")]<-
+            ifelse(min(minNA)>min(partdt$date),
+                   partdt[(positionNA-1),c("open","high","close","low","change")],
+                   NA)
+      partdt
+}
+#result function
+resultData<-function(df1){
+      tockn<-unique(df1[is.na(df1$open),"stockId"])
+      newdf<-data.frame()
+      for(tockname in tockn){
+            newdf<-rbind(newdf,insertFun(tockname))
+      }
+      newdf<-newdf[!is.na(newdf$open),]
+      newdf<-rbind(newdf,df1[!(df1$stockId %in% tockn),])
+}
+
+#read the data and out put the result
+#read table,and sort
+df<-read.table("股票K值合并sina.txt",head=T,sep=",",
+               colClasses=c("character","Date","numeric","numeric","numeric",
+                            "numeric","numeric"))
+df<-df[order(df$stockId,df$date),]
+#build a time series
+seriestime<-unique(df[order(df$date),"date"])
+n<-length(seriestime)
+#bind the data and time series
+allstockname<-unique(df$stockId)
+seriestime<-data.frame(date=as.Date(seriestime),
+                       stockId=rep(allstockname,each=n))
+df1<-merge(df,seriestime,by=c("date","stockId"),all.y=T)
+
+#out put the result
+write.table(resultData(df1),file="股票K值合并sina1.txt",quote =FALSE,sep = ",",
+            row.names = FALSE)
+
 ######yahoo,对于中国股市，会出现异常##################################
 get.quotes<-function(ticker,
                      from=(Sys.Date()-134),
