@@ -1,4 +1,4 @@
-######sina，针对中国股市#########
+######sina#########
 get.quotes<-function(ticker,
                      from=(Sys.Date()-365),
                      to=(Sys.Date())){
@@ -49,16 +49,17 @@ get.multiple.quotes<-function(tkrs,
 #all stocke id in this file.The type must be vectors.
 #For shanghai,the vector must bulid like "sh600018"
 #For shenzhen,the vector must bulid like "sz002241"
-dow.tickers<-as.vector(t(read.table("allStokeId.txt",head=FALSE)))
+dow.tickers<-as.vector(t(read.table("etfID.txt",header=FALSE)))
+dow.tickers<-c("sh000001")
 #write out
 write.table(get.multiple.quotes(dow.tickers,
-                                from=as.Date("2014-07-01"),
-                                to=as.Date("2014-10-31")),
-            file="股票K值合并sina.txt",
+                                from=as.Date("2005-02-23"),
+                                to=as.Date("2015-03-30")),
+            file="sh000001.txt",
             sep=",",row.names = FALSE,quote = FALSE,
             col.names=c("stockId","date","open","high","close","low","change"))
 
-########数据不足或者某日停盘#######################
+########If there is missing data in dataframe ####
 #insert function
 insertFun<-function(stockname){
       partdt<-df1[df1$stockId==stockname,]
@@ -66,12 +67,11 @@ insertFun<-function(stockname){
       n<-length(minNA)
       for(i in 1:n){
             positionNA<-grep(minNA[i],partdt$date)
-            if(positionNA!=1){
+            #IF there has missing data, using the fowlling data insert to df
+            if(positionNA !=1){
                   partdt[positionNA,3:7]<-partdt[positionNA-1,3:7]
             }
-            if(positionNA==1){
-                  partdt[i,3:7]<-NA
-            }
+            else partdt[i,3:7]<-NA
       }
       partdt
 }
@@ -82,7 +82,6 @@ resultData<-function(df1){
       newdf<-data.frame()
       for(stockname in stockn){
             newdf<-rbind(newdf,insertFun(stockname))
-            
       }
       newdf<-newdf[!is.na(newdf$open),]
       newdf<-rbind(newdf,df1[!(df1$stockId %in% stockn),])
@@ -92,7 +91,7 @@ resultData<-function(df1){
 
 #read the data and out put the result
 #read table,and sort
-df<-read.table("股票K值合并sina.txt",head=T,sep=",",
+df<-read.table("etfData_more.txt",head=T,sep=",",
                colClasses=c("character","Date","numeric","numeric","numeric",
                             "numeric","numeric"))
 df<-df[order(df$stockId,df$date),]
@@ -106,10 +105,10 @@ seriestime<-data.frame(date=as.Date(seriestime),
 df1<-merge(df,seriestime,by=c("date","stockId"),all.y=T)
 
 #out put the result
-write.table(resultData(df1),file="股票K值合并sina1.txt",quote =FALSE,sep = ",",
+write.table(resultData(df1),file="ETFData1.txt",quote =FALSE,sep = ",",
             row.names = FALSE)
 
-######yahoo,对于中国股市，会出现异常##################################
+######yahoo,face internal stock,not suit for china############
 get.quotes<-function(ticker,
                      from=(Sys.Date()-134),
                      to=(Sys.Date()),
