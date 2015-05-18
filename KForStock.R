@@ -51,13 +51,20 @@ get.multiple.quotes<-function(tkrs,
 #For shenzhen,the vector must bulid like "sz002241"
 dow.tickers<-as.vector(t(read.table("etfID.txt",header=FALSE)))
 dow.tickers<-c("sh000001","sz399106")
+dow.tickers<-c("sh510180")
 #write out
 write.table(get.multiple.quotes(dow.tickers,
                                 from=as.Date("2005-04-28"),
-                                to=as.Date("2015-04-29")),
+                                to=as.Date("2015-05-13")),
             file="sh000001.txt",
             sep=",",row.names = FALSE,quote = FALSE,
             col.names=c("stockId","date","open","high","close","low","change"))
+
+write.table(get.multiple.quotes(dow.tickers,
+                                from=as.Date("2015-04-28"),
+                                to=as.Date("2015-05-13")),
+            file="sh000001.txt",
+            sep=",",row.names = FALSE,quote = FALSE)
 
 ########If there is missing data in dataframe ####
 #insert function
