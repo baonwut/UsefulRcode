@@ -13,10 +13,12 @@ realtimeK<-function(STOCKID,TYPE="stock"){
           #K on sina
           Klist<-unlist(lapply(id,function(id){
                 readLines(paste("http://hq.sinajs.cn/list=",id,sep="")
-                          )}))
-          Klist<-substr(Klist,22,unlist(lapply(Klist,nchar))-2)
-          Kdt<-data.frame(matrix(unlist(strsplit(Klist,",")),byrow=T,ncol=33))
-          Kdt<-data.frame(id,Kdt)
+                )}))
+          Klist<-Klist[!(nchar(Klist)<50)]#remove NULL
+          Klist<-substr(Klist,14,unlist(lapply(Klist,nchar))-2)
+          Kdt<-data.frame(matrix(unlist(strsplit(Klist,"[,]|[=]|[\"]",perl=T)),
+                                 byrow=T,ncol=35))
+          Kdt<-Kdt[-2]
           names(Kdt)<-c("id","stockname","todayOpen","yestClose",
                       "nowPrice","todayHigh",
                       "todayLow","buyPrice","sellPrice",
@@ -44,12 +46,12 @@ realtimeK<-function(STOCKID,TYPE="stock"){
                 readLines(paste("http://qt.gtimg.cn/r=0.8409869808238q=",
                               id,sep="")
                           )}))
-          Klist1<-substr(Klist1,16,unlist(lapply(Klist1,nchar))-2)
-          Kdt1<-data.frame(matrix(unlist(strsplit(Klist1,"~")),
-                                  byrow=T,ncol=48))
-          Kdt1<-Kdt1[,c(2,44,45)]
-          Kdt1<-data.frame(id,Kdt1)
-          names(Kdt1)<-c("id","stockid","MarketValue","TotalMarketValue")
+          Klist1<-substr(Klist1,5,unlist(lapply(Klist1,nchar))-3)
+          Klist1<-sub("[\"]","",Klist1,perl=T)
+          Kdt1<-data.frame(matrix(unlist(strsplit(Klist1,"[~]|[=]",perl=T)),
+                                  byrow=T,ncol=50))
+          Kdt1<-Kdt1[,c(1,46,47)]
+          names(Kdt1)<-c("id","MarketValue","TotalMarketValue")
           
           #merge
           Kdt<-merge(Kdt,Kdt1,by="id",all.x=T)

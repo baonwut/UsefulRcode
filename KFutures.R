@@ -3,7 +3,7 @@
 #Physical Futures:though can use like AU0 as Gold Futures,But there something different from actual world
 #Stock Index Futures:http://stock2.finance.sina.com.cn/futures/api/json.php/CffexFuturesService.getCffexFuturesDailyKLine?symbol=IF1504
 
-#eg:id<-data.frame(c("IF1504" ,"IF1505"));type<-"Index"
+#eg:id<-data.frame(c("IF1506" ,"IF1505"));type<-"Index"
 #call:ReadAllFuture(id,type)
 #write.table(ReadAllFuture(id,type),file="StockIndexFutures.txt",
  #           sep=",",row.names=F,quote =F,fileEncoding="UTF-8")
