@@ -6,20 +6,22 @@
 #eg:id<-data.frame(c("IF1506" ));type<-"Index"
 #call:ReadAllFuture(id,type)
 #write.table(ReadAllFuture(id,type),file="StockIndexFutures.txt",sep=",",row.names=F,quote =F,fileEncoding="UTF-8")
-URLFun<-function(ID,TYPE=c("Physical","Index")){
-      ifelse(TYPE=="Physical",paste("http://stock2.finance.sina.com.cn/futures/api/json.php/IndexService.getInnerFuturesDailyKLine?symbol=",
-                                    ID,sep="")
+URLFun<-function(ID,TYPE=c("Physical","Index"),TIME=c(5,15,30,60)){
+      ifelse(TYPE=="Physical",paste("http://stock2.finance.sina.com.cn/futures/api/json.php/IndexService.getInnerFuturesMiniKLine",
+                                    TIME,"m?symbol=",
+                                    ID,sep=""),
              ifelse(TYPE=="Index",
-                    paste("http://stock2.finance.sina.com.cn/futures/api/json.php/CffexFuturesService.getCffexFuturesDailyKLine?symbol=",
+                    paste("http://stock2.finance.sina.com.cn/futures/api/json.php/CffexFuturesService.getCffexFuturesMiniKLine",
+                          TIME,"m?symbol=",
                           ID,sep=""),
                     "Choose one type"))
-
+      
       
 }
 
-ReadOneFuture<-function(ID,TYPE){
+ReadOneFuture<-function(ID,TYPE,TIME){
       #read url
-      con<-url(URLFun(ID,TYPE))
+      con<-url(URLFun(ID,TYPE,TIME))
       data<-readLines(con,warn =F)
       close(con)
       #clean the data
@@ -30,17 +32,16 @@ ReadOneFuture<-function(ID,TYPE){
       
 }
 
-ReadAllFuture<-function(IDLIST,TYPE){
+ReadAllFuture<-function(IDLIST,TYPE,TIME){
       #make the IDLIST as a vector
       if(class(IDLIST)=="data.frame") IDLIST<-as.vector(as.matrix(IDLIST))
       #merge future data into one dataframe
       dt<-data.frame()
       for(i in IDLIST){
-            tmp<-ReadOneFuture(i,TYPE)
+            tmp<-ReadOneFuture(i,TYPE,TIME)
             dt<-rbind(dt,tmp)
       }
       dt<-dt[!dt[,2]=="null",]
       names(dt)<-c("ID","date","open","high","low","close","change")
       dt
 }
-
