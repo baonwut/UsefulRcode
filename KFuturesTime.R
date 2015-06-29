@@ -3,18 +3,28 @@
 #Physical Futures:though can use like AU0 as Gold Futures,But there something different from actual world
 #Stock Index Futures:http://stock2.finance.sina.com.cn/futures/api/json.php/CffexFuturesService.getCffexFuturesDailyKLine?symbol=IF1504
 
-#eg:id<-data.frame(c("IF1506" ));type<-"Index"
-#call:ReadAllFuture(id,type)
-#write.table(ReadAllFuture(id,type),file="StockIndexFutures.txt",sep=",",row.names=F,quote =F,fileEncoding="UTF-8")
-URLFun<-function(ID,TYPE=c("Physical","Index"),TIME=c(5,15,30,60)){
-      ifelse(TYPE=="Physical",paste("http://stock2.finance.sina.com.cn/futures/api/json.php/IndexService.getInnerFuturesMiniKLine",
-                                    TIME,"m?symbol=",
-                                    ID,sep=""),
-             ifelse(TYPE=="Index",
-                    paste("http://stock2.finance.sina.com.cn/futures/api/json.php/CffexFuturesService.getCffexFuturesMiniKLine",
-                          TIME,"m?symbol=",
+#eg:id<-data.frame(c("IF1506" ));type<-"Index",Time<-5
+#call:ReadAllFuture(id,type,Time)
+#write.table(ReadAllFuture(id,type,Time),file="StockIndexFutures.txt",sep=",",row.names=F,quote =F,fileEncoding="UTF-8")
+URLFun<-function(ID,TYPE=c("Physical","Index"),TIME=c(5,15,30,60,0)){
+      ifelse(TYPE=="Physical" & TIME!=0,
+             paste("http://stock2.finance.sina.com.cn/futures/api/json.php/IndexService.getInnerFuturesMiniKLine",
+                   TIME,"m?symbol=",
+                   ID,sep=""),
+             ifelse(TYPE=="Physical" & TIME==0,
+                    paste("http://stock2.finance.sina.com.cn/futures/api/json.php/IndexService.getInnerFuturesDailyKLine?symbol=",
                           ID,sep=""),
-                    "Choose one type"))
+                    ifelse(TYPE=="Index"& TIME!=0,
+                           paste("http://stock2.finance.sina.com.cn/futures/api/json.php/CffexFuturesService.getCffexFuturesMiniKLine",
+                                 TIME,"m?symbol=",
+                                 ID,sep=""),
+                           ifelse(TYPE=="Index"& TIME==0,
+                                  paste("http://stock2.finance.sina.com.cn/futures/api/json.php/CffexFuturesService.getCffexFuturesDailyKLine?symbol=",
+                                        ID,sep=""),
+                                  "Choose one type")
+                           )
+                    )
+             )
       
       
 }
